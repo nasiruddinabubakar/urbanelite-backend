@@ -5,7 +5,6 @@ import com.example.urbanelite.entity.OrderItem;
 import com.example.urbanelite.entity.Product;
 import com.example.urbanelite.entity.User;
 import com.example.urbanelite.model.OrderItemRequest;
-import com.example.urbanelite.model.OrderModel;
 import com.example.urbanelite.repository.OrderRepository;
 import com.example.urbanelite.repository.ProductRepository;
 import com.example.urbanelite.repository.UserRepository;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -36,7 +34,7 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public void addNewOrder(Long userId, OrderModel orderModel) {
+    public void addNewOrder(Long userId, List<OrderItemRequest> orderItemRequestList) {
 
         Order order = new Order();
         User user = userRepository.findById(userId)
@@ -44,7 +42,7 @@ public class OrderService {
 
         order.setUser(user);
 
-        List<OrderItem> orderItemList = orderModel.getOrderItems().stream().map((itemRequest) -> {
+        List<OrderItem> orderItemList = orderItemRequestList.stream().map((itemRequest) -> {
             OrderItem orderItem = new OrderItem();
             Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new RuntimeException("No Product found"));
@@ -59,6 +57,12 @@ public class OrderService {
 
         orderRepository.save(order);
 
+
+    }
+
+    public List<Order> getOrdersByUserId(Long userId) {
+
+        return orderRepository.findOrdersByUserId(userId);
 
     }
 }

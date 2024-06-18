@@ -1,5 +1,8 @@
 package com.example.urbanelite.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +17,7 @@ import java.util.List;
 @Builder
 @Setter
 @Getter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Order {
     @Id
     @SequenceGenerator(
@@ -30,12 +34,13 @@ public class Order {
     @Setter
     private LocalDateTime orderDate;
 
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn
-            (name = "user_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference // To avoid recursive serialization
     private User user;
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // To manage the relationship serialization
     private List<OrderItem> orderItems;
 
 }
