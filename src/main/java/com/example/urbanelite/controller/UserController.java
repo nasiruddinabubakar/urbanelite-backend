@@ -3,8 +3,14 @@ package com.example.urbanelite.controller;
 import com.example.urbanelite.entity.User;
 import com.example.urbanelite.model.UserModel;
 import com.example.urbanelite.service.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
@@ -19,18 +25,15 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(path = "/")
-    public String createUser(@Validated @RequestBody UserModel userModel) {
 
-        userService.saveNewUser(userModel);
-        return "User Created";
-    }
+    @GetMapping(path = "/getuser")
+    public ResponseEntity<User> authenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-    @GetMapping(path = "/")
-    public Optional<User> getUser(@Validated @RequestParam Long userId) {
+        User currentUser = (User) authentication.getPrincipal();
+        System.out.println(currentUser);
 
-        return userService.getUserById(userId);
-
+        return ResponseEntity.ok(currentUser);
     }
 
     @PutMapping(path = "/")

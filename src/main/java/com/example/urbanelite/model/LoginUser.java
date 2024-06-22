@@ -1,19 +1,13 @@
 package com.example.urbanelite.model;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter
 @Getter
-public class UserModel {
+public class LoginUser {
 
-    @Setter
-    private String firstName;
-    @Setter
-    private String lastName;
-    @Setter
     private String email;
-    @Setter
     private String password;
 
 }
