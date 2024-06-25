@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,19 +29,22 @@ public class OrderController {
 
     @PostMapping("/")
     public ResponseEntity<String> createOrder(
-            @NotNull @RequestBody List<OrderItemRequest> orderItemRequestList,
-            @RequestParam Long userId) {
-
+            @NotNull @RequestBody List<OrderItemRequest> orderItemRequestList
+           ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User)  authentication.getPrincipal();
         // Assuming orderModel is already populated correctly from the request body
-        orderService.addNewOrder(userId, Objects.requireNonNull(orderItemRequestList));
+        orderService.addNewOrder(currentUser.getUserId(), Objects.requireNonNull(orderItemRequestList));
 
         return ResponseEntity.ok("Order placed successfully");
     }
 
     @GetMapping("/")
-    public List<Order> getUserOrders(@RequestParam Long userId){
-
-        return orderService.getOrdersByUserId(userId);
+    public List<Order> getUserOrders(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User)  authentication.getPrincipal();
+        System.out.println(currentUser.getUserId());
+        return orderService.getOrdersByUserId(currentUser.getUserId());
 
     }
 }
